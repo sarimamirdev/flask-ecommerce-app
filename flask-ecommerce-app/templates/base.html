@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}ShopSmart - Your Online Store{% endblock %}</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f4f6f9;
+            color: #333;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* nav bar */
+        .navbar {
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .navbar .brand {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: #fff;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .navbar .brand span {
+            color: #f0a500;
+        }
+
+        .navbar .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .navbar .nav-links a {
+            color: #c8d6e5;
+            text-decoration: none;
+            font-size: 0.95rem;
+            transition: color 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .navbar .nav-links a:hover {
+            color: #f0a500;
+        }
+
+        .navbar .nav-links .cart-link {
+            background: #f0a500;
+            color: #1a1a2e;
+            padding: 0.4rem 1rem;
+            border-radius: 25px;
+            font-weight: 600;
+        }
+
+        .navbar .nav-links .cart-link:hover {
+            background: #ffb800;
+            color: #1a1a2e;
+        }
+
+        .navbar .nav-links .cart-badge {
+            background: #e74c3c;
+            color: white;
+            border-radius: 50%;
+            padding: 0.1rem 0.5rem;
+            font-size: 0.75rem;
+            font-weight: bold;
+            margin-left: 0.2rem;
+        }
+
+        .navbar .nav-links .logout {
+            color: #e74c3c;
+        }
+
+        .navbar .nav-links .logout:hover {
+            color: #ff6b6b;
+        }
+
+        /* flash messages */
+        .flash-messages {
+            padding: 1rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .flash-message {
+            padding: 0.8rem 1.2rem;
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            animation: slideDown 0.4s ease;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .flash-message.success { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+        .flash-message.danger { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+        .flash-message.warning { background: #fff3cd; color: #856404; border-left: 4px solid #ffc107; }
+        .flash-message.info { background: #d1ecf1; color: #0c5460; border-left: 4px solid #17a2b8; }
+
+        .flash-close {
+            float: right;
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            color: inherit;
+            opacity: 0.7;
+        }
+
+        .flash-close:hover { opacity: 1; }
+
+        /* main area */
+        .main-content {
+            flex: 1;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            width: 100%;
+        }
+
+        /* footer */
+        .footer {
+            background: #1a1a2e;
+            color: #c8d6e5;
+            text-align: center;
+            padding: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .footer a {
+            color: #f0a500;
+            text-decoration: none;
+        }
+
+        /* mobile */
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+                align-items: stretch;
+                text-align: center;
+            }
+
+            .navbar .nav-links {
+                justify-content: center;
+            }
+
+            .main-content {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- nav -->
+    <nav class="navbar">
+        <a href="{{ url_for('index') }}" class="brand">
+            🛒 Shop<span>Smart</span>
+        </a>
+
+        <div class="nav-links">
+            <a href="{{ url_for('index') }}">🏠 Home</a>
+            <a href="{{ url_for('products') }}">📦 Products</a>
+
+            {% if session.user_id %}
+                <a href="{{ url_for('orders') }}">📋 Orders</a>
+                <a href="{{ url_for('cart') }}" class="cart-link">
+                    🛒 Cart
+                    {% if cart_count > 0 %}
+                        <span class="cart-badge">{{ cart_count }}</span>
+                    {% endif %}
+                </a>
+                <span style="color: #c8d6e5;">👋 {{ session.username }}</span>
+                <a href="{{ url_for('logout') }}" class="logout">🚪 Logout</a>
+            {% else %}
+                <a href="{{ url_for('login') }}">🔑 Login</a>
+                <a href="{{ url_for('register') }}">📝 Register</a>
+            {% endif %}
+        </div>
+    </nav>
+
+    <!-- flash messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="flash-messages">
+                {% for category, message in messages %}
+                    <div class="flash-message {{ category }}">
+                        {{ message }}
+                        <button class="flash-close" onclick="this.parentElement.style.display='none'">✕</button>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <!-- page content -->
+    <main class="main-content">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- footer -->
+    <footer class="footer">
+        <p>🛒 ShopSmart &copy; 2026 — Built with ❤️ using Flask</p>
+        <p style="font-size: 0.8rem; opacity: 0.7;">Developer: Muhammad Sarim Amir | IoT Application Technology</p>
+    </footer>
+
+</body>
+</html>

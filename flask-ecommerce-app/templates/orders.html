@@ -1,0 +1,155 @@
+{% extends 'base.html' %}
+
+{% block title %}My Orders - ShopSmart{% endblock %}
+
+{% block content %}
+
+<style>
+    .orders-container {
+        background: white;
+        border-radius: 16px;
+        padding: 2rem;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    }
+
+    .orders-container h2 {
+        font-size: 2rem;
+        color: #1a1a2e;
+        margin-bottom: 1.5rem;
+    }
+
+    .orders-container h2 span { color: #f0a500; }
+
+    .order-card {
+        border: 1px solid #e9ecef;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        transition: box-shadow 0.3s ease;
+    }
+
+    .order-card:hover {
+        box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    }
+
+    .order-card .order-header {
+        display: flex;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-bottom: 0.8rem;
+        padding-bottom: 0.8rem;
+        border-bottom: 1px solid #e9ecef;
+    }
+
+    .order-card .order-header .order-id {
+        font-weight: 700;
+        color: #1a1a2e;
+    }
+
+    .order-card .order-header .order-status {
+        font-weight: 600;
+        padding: 0.2rem 1rem;
+        border-radius: 20px;
+        font-size: 0.85rem;
+    }
+
+    .order-card .order-header .status-pending {
+        background: #fff3cd;
+        color: #856404;
+    }
+
+    .order-card .order-header .status-completed {
+        background: #d4edda;
+        color: #155724;
+    }
+
+    .order-card .order-header .status-cancelled {
+        background: #f8d7da;
+        color: #721c24;
+    }
+
+    .order-card .order-items {
+        padding-left: 1rem;
+    }
+
+    .order-card .order-items .item {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.3rem 0;
+        font-size: 0.95rem;
+        color: #555;
+    }
+
+    .order-card .order-total {
+        text-align: right;
+        font-size: 1.2rem;
+        font-weight: 700;
+        padding-top: 0.8rem;
+        margin-top: 0.8rem;
+        border-top: 1px solid #e9ecef;
+    }
+
+    .order-card .order-total span { color: #f0a500; }
+
+    .order-card .order-address {
+        font-size: 0.9rem;
+        color: #6c757d;
+        margin-top: 0.5rem;
+    }
+
+    .empty-orders {
+        text-align: center;
+        padding: 3rem;
+        color: #6c757d;
+    }
+
+    .empty-orders .big-icon { font-size: 4rem; }
+</style>
+
+<div class="orders-container">
+    <h2>📋 My <span>Orders</span></h2>
+
+    {% if orders %}
+        {% for order in orders %}
+            <div class="order-card">
+                <div class="order-header">
+                    <span class="order-id">Order #{{ order.id }}</span>
+                    <span>{{ order.created_at.strftime('%Y-%m-%d %H:%M') }}</span>
+                    <span class="order-status
+                        {% if order.status == 'Pending' %}status-pending
+                        {% elif order.status == 'Completed' %}status-completed
+                        {% else %}status-cancelled{% endif %}">
+                        {{ order.status }}
+                    </span>
+                </div>
+
+                <div class="order-items">
+                    {% for item in order.items %}
+                        <div class="item">
+                            <span>{{ item.product.name }} × {{ item.quantity }}</span>
+                            <span>${{ "%.2f"|format(item.price * item.quantity) }}</span>
+                        </div>
+                    {% endfor %}
+                </div>
+
+                <div class="order-address">
+                    📦 Shipping: {{ order.shipping_address or 'No address provided' }}
+                </div>
+
+                <div class="order-total">
+                    Total: <span>${{ "%.2f"|format(order.total_amount) }}</span>
+                </div>
+            </div>
+        {% endfor %}
+    {% else %}
+        <div class="empty-orders">
+            <div class="big-icon">📦</div>
+            <h3>No orders yet</h3>
+            <p>Start shopping to see your orders here.</p>
+            <a href="{{ url_for('products') }}" class="btn-sm" style="display:inline-block; padding:0.6rem 2rem; background:#f0a500; color:#1a1a2e; text-decoration:none; border-radius:20px; margin-top:0.5rem;">Start Shopping</a>
+        </div>
+    {% endif %}
+</div>
+
+{% endblock %}

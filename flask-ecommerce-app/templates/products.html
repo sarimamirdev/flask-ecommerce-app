@@ -1,0 +1,184 @@
+{% extends 'base.html' %}
+
+{% block title %}Products - ShopSmart{% endblock %}
+
+{% block content %}
+
+<style>
+    .catalog-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .catalog-header h2 {
+        font-size: 2rem;
+        color: #1a1a2e;
+    }
+
+    .catalog-header h2 span { color: #f0a500; }
+
+    .catalog-header .search-form {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+    }
+
+    .catalog-header .search-form input,
+    .catalog-header .search-form select {
+        padding: 0.6rem 1rem;
+        border: 2px solid #ddd;
+        border-radius: 8px;
+        font-size: 0.95rem;
+        background: white;
+    }
+
+    .catalog-header .search-form input:focus,
+    .catalog-header .search-form select:focus {
+        border-color: #f0a500;
+        outline: none;
+    }
+
+    .catalog-header .search-form button {
+        padding: 0.6rem 1.5rem;
+        background: #f0a500;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.3s ease;
+    }
+
+    .catalog-header .search-form button:hover { background: #ffb800; }
+
+    .product-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .product-card {
+        background: white;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        text-align: center;
+        padding: 1rem;
+    }
+
+    .product-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    }
+
+    .product-card img {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+        border-radius: 8px;
+        background: #f4f6f9;
+    }
+
+    .product-card .category-tag {
+        display: inline-block;
+        background: #e9ecef;
+        padding: 0.2rem 0.8rem;
+        border-radius: 12px;
+        font-size: 0.7rem;
+        color: #6c757d;
+        margin: 0.4rem 0;
+    }
+
+    .product-card h3 {
+        font-size: 1.1rem;
+        margin: 0.3rem 0;
+        color: #1a1a2e;
+    }
+
+    .product-card .price {
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: #f0a500;
+    }
+
+    .product-card .stock {
+        font-size: 0.8rem;
+        color: #6c757d;
+    }
+
+    .product-card .btn-sm {
+        display: inline-block;
+        padding: 0.4rem 1.2rem;
+        background: #1a1a2e;
+        color: white;
+        text-decoration: none;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        margin-top: 0.5rem;
+        transition: background 0.3s ease;
+        border: none;
+        cursor: pointer;
+    }
+
+    .product-card .btn-sm:hover { background: #f0a500; color: #1a1a2e; }
+
+    .empty-msg {
+        text-align: center;
+        color: #6c757d;
+        padding: 3rem;
+        font-size: 1.2rem;
+    }
+
+    @media (max-width: 600px) {
+        .catalog-header { flex-direction: column; align-items: stretch; }
+        .catalog-header .search-form { flex-direction: column; }
+    }
+</style>
+
+<div class="catalog-header">
+    <h2>📦 Our <span>Products</span></h2>
+
+    <form method="GET" action="{{ url_for('products') }}" class="search-form">
+        <input type="text" name="search" placeholder="🔍 Search products..." value="{{ search or '' }}">
+        <select name="category">
+            <option value="">All Categories</option>
+            {% for cat in categories %}
+                {% if cat[0] %}
+                    <option value="{{ cat[0] }}" {% if category == cat[0] %}selected{% endif %}>
+                        {{ cat[0] }}
+                    </option>
+                {% endif %}
+            {% endfor %}
+        </select>
+        <button type="submit">Filter</button>
+        <a href="{{ url_for('products') }}" style="padding:0.6rem 1.2rem; background:#e9ecef; border-radius:8px; text-decoration:none; color:#333;">Clear</a>
+    </form>
+</div>
+
+{% if products %}
+    <div class="product-grid">
+        {% for product in products %}
+            <div class="product-card">
+                <!-- Updated: No |urlencode needed because filenames use underscores now -->
+                <img src="{{ url_for('static', filename='images/' + product.image_filename) if product.image_filename else 'https://via.placeholder.com/300x200/4e73df/ffffff?text=Product' }}"
+                     alt="{{ product.name }}">
+                <span class="category-tag">{{ product.category or 'Uncategorized' }}</span>
+                <h3>{{ product.name }}</h3>
+                <div class="price">${{ "%.2f"|format(product.price) }}</div>
+                <div class="stock">In Stock: {{ product.stock_quantity }}</div>
+                <a href="{{ url_for('product_detail', id=product.id) }}" class="btn-sm">View Details</a>
+            </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="empty-msg">
+        <p>😕 No products found matching your criteria.</p>
+        <p><a href="{{ url_for('products') }}">View all products</a></p>
+    </div>
+{% endif %}
+
+{% endblock %}

@@ -1,0 +1,145 @@
+{% extends 'base.html' %}
+
+{% block title %}Home - ShopSmart{% endblock %}
+
+{% block content %}
+
+<style>
+    .hero {
+        text-align: center;
+        padding: 3rem 0;
+        background: linear-gradient(135deg, #1a1a2e, #16213e);
+        border-radius: 16px;
+        margin-bottom: 2rem;
+        color: white;
+    }
+
+    .hero h1 {
+        font-size: 2.8rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .hero h1 span { color: #f0a500; }
+
+    .hero p {
+        font-size: 1.2rem;
+        color: #c8d6e5;
+        margin-bottom: 1.5rem;
+    }
+
+    .hero .btn {
+        display: inline-block;
+        padding: 0.8rem 2.5rem;
+        background: #f0a500;
+        color: #1a1a2e;
+        text-decoration: none;
+        border-radius: 30px;
+        font-weight: 600;
+        transition: background 0.3s ease;
+    }
+
+    .hero .btn:hover { background: #ffb800; }
+
+    .section-title {
+        font-size: 2rem;
+        margin-bottom: 1.5rem;
+        text-align: center;
+        color: #1a1a2e;
+    }
+
+    .section-title span { color: #f0a500; }
+
+    .product-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .product-card {
+        background: white;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        text-align: center;
+        padding: 1rem;
+    }
+
+    .product-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    }
+
+    .product-card img {
+        width: 100%;
+        height: 160px;
+        object-fit: cover;
+        border-radius: 8px;
+        background: #f4f6f9;
+    }
+
+    .product-card h3 {
+        font-size: 1.1rem;
+        margin: 0.8rem 0 0.3rem;
+        color: #1a1a2e;
+    }
+
+    .product-card .price {
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: #f0a500;
+    }
+
+    .product-card .btn-sm {
+        display: inline-block;
+        padding: 0.4rem 1.2rem;
+        background: #1a1a2e;
+        color: white;
+        text-decoration: none;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        margin-top: 0.5rem;
+        transition: background 0.3s ease;
+        border: none;
+        cursor: pointer;
+    }
+
+    .product-card .btn-sm:hover { background: #f0a500; color: #1a1a2e; }
+
+    .empty-msg {
+        text-align: center;
+        color: #6c757d;
+        padding: 3rem;
+        font-size: 1.2rem;
+    }
+</style>
+
+<div class="hero">
+    <h1>Welcome to <span>ShopSmart</span></h1>
+    <p>Your one-stop shop for quality products at great prices!</p>
+    <a href="{{ url_for('products') }}" class="btn">🛍️ Start Shopping</a>
+</div>
+
+<h2 class="section-title">🔥 Featured <span>Products</span></h2>
+
+{% if products %}
+    <div class="product-grid">
+        {% for product in products %}
+            <div class="product-card">
+                <img src="{{ url_for('static', filename='images/' + product.image_filename) if product.image_filename else 'https://via.placeholder.com/300x200/4e73df/ffffff?text=Product' }}"
+                     alt="{{ product.name }}">
+                <h3>{{ product.name }}</h3>
+                <div class="price">${{ "%.2f"|format(product.price) }}</div>
+                <a href="{{ url_for('product_detail', id=product.id) }}" class="btn-sm">View Details</a>
+            </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="empty-msg">
+        <p>No products available yet.</p>
+        <!-- FIXED: Changed from add_sample_products to init_db -->
+        <p style="font-size: 0.9rem;">Visit <a href="{{ url_for('init_db') }}">/init_db</a> to add all products.</p>
+    </div>
+{% endif %}
+
+{% endblock %}

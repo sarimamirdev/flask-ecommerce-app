@@ -1,0 +1,140 @@
+{% extends 'base.html' %}
+
+{% block title %}Checkout - ShopSmart{% endblock %}
+
+{% block content %}
+
+<style>
+    .checkout-container {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 2rem;
+    }
+
+    .checkout-form {
+        background: white;
+        border-radius: 16px;
+        padding: 2rem;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    }
+
+    .checkout-form h2 {
+        font-size: 1.8rem;
+        color: #1a1a2e;
+        margin-bottom: 1.5rem;
+    }
+
+    .checkout-form h2 span { color: #f0a500; }
+
+    .checkout-form label {
+        font-weight: 600;
+        display: block;
+        margin: 1rem 0 0.3rem;
+    }
+
+    .checkout-form textarea {
+        width: 100%;
+        padding: 0.8rem;
+        border: 2px solid #ddd;
+        border-radius: 8px;
+        font-size: 1rem;
+        resize: vertical;
+        min-height: 100px;
+    }
+
+    .checkout-form textarea:focus {
+        border-color: #f0a500;
+        outline: none;
+    }
+
+    .checkout-form .btn-place-order {
+        width: 100%;
+        padding: 1rem;
+        background: #28a745;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 1.2rem;
+        font-weight: 600;
+        cursor: pointer;
+        margin-top: 1.5rem;
+        transition: background 0.3s ease;
+    }
+
+    .checkout-form .btn-place-order:hover { background: #218838; }
+
+    .order-summary {
+        background: white;
+        border-radius: 16px;
+        padding: 2rem;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+        align-self: start;
+        position: sticky;
+        top: 100px;
+    }
+
+    .order-summary h3 {
+        font-size: 1.3rem;
+        margin-bottom: 1rem;
+        color: #1a1a2e;
+    }
+
+    .order-summary .item {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.5rem 0;
+        border-bottom: 1px solid #e9ecef;
+        font-size: 0.95rem;
+    }
+
+    .order-summary .total {
+        font-size: 1.5rem;
+        font-weight: 700;
+        padding-top: 1rem;
+        margin-top: 0.5rem;
+        border-top: 2px solid #1a1a2e;
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .order-summary .total span { color: #f0a500; }
+
+    @media (max-width: 768px) {
+        .checkout-container {
+            grid-template-columns: 1fr;
+        }
+        .order-summary { position: static; }
+    }
+</style>
+
+<div class="checkout-container">
+    <div class="checkout-form">
+        <h2>📋 <span>Checkout</span></h2>
+
+        <!-- FIXED: Submits to Flask backend -->
+        <form method="POST" action="{{ url_for('checkout') }}">
+            <label for="shipping_address">Shipping Address</label>
+            <textarea name="shipping_address" id="shipping_address" placeholder="Enter your full shipping address..." required></textarea>
+
+            <button type="submit" class="btn-place-order">✅ Place Order</button>
+        </form>
+    </div>
+
+    <div class="order-summary">
+        <h3>📦 Order Summary</h3>
+
+        {% for item in cart_items %}
+            <div class="item">
+                <span>{{ item.product.name }} × {{ item.quantity }}</span>
+                <span>${{ "%.2f"|format(item.product.price * item.quantity) }}</span>
+            </div>
+        {% endfor %}
+
+        <div class="total">
+            <span>Total:</span>
+            <span>${{ "%.2f"|format(total) }}</span>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

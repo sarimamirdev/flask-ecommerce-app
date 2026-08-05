@@ -1,0 +1,149 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ product.name }} - ShopSmart{% endblock %}
+
+{% block content %}
+
+<style>
+    .product-detail {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2.5rem;
+        background: white;
+        border-radius: 16px;
+        padding: 2.5rem;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    }
+
+    .product-detail img {
+        width: 100%;
+        height: 400px;
+        object-fit: cover;
+        border-radius: 12px;
+        background: #f4f6f9;
+    }
+
+    .product-detail .info h2 {
+        font-size: 2rem;
+        color: #1a1a2e;
+        margin-bottom: 0.5rem;
+    }
+
+    .product-detail .info .price {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #f0a500;
+        margin-bottom: 1rem;
+    }
+
+    .product-detail .info .category {
+        display: inline-block;
+        background: #e9ecef;
+        padding: 0.3rem 1rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        color: #6c757d;
+        margin-bottom: 1rem;
+    }
+
+    .product-detail .info .description {
+        color: #555;
+        line-height: 1.7;
+        margin-bottom: 1.5rem;
+    }
+
+    .product-detail .info .stock {
+        font-weight: 600;
+        margin-bottom: 1rem;
+    }
+
+    .product-detail .info .in-stock { color: #28a745; }
+    .product-detail .info .out-of-stock { color: #dc3545; }
+
+    .product-detail .info .add-form {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .product-detail .info .add-form input {
+        width: 70px;
+        padding: 0.6rem;
+        border: 2px solid #ddd;
+        border-radius: 8px;
+        text-align: center;
+        font-size: 1.1rem;
+    }
+
+    .product-detail .info .add-form button {
+        padding: 0.7rem 2rem;
+        background: #f0a500;
+        color: #1a1a2e;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: background 0.3s ease;
+    }
+
+    .product-detail .info .add-form button:hover { background: #ffb800; }
+
+    .product-detail .info .back-link {
+        display: inline-block;
+        margin-top: 1.5rem;
+        color: #6c757d;
+        text-decoration: none;
+    }
+
+    .product-detail .info .back-link:hover { color: #f0a500; }
+
+    @media (max-width: 768px) {
+        .product-detail {
+            grid-template-columns: 1fr;
+        }
+        .product-detail img {
+            height: 250px;
+        }
+    }
+</style>
+
+<div class="product-detail">
+    <!-- Updated: Removed |urlencode -->
+    <img src="{{ url_for('static', filename='images/' + product.image_filename) if product.image_filename else 'https://via.placeholder.com/500x350/4e73df/ffffff?text=Product' }}"
+         alt="{{ product.name }}">
+
+    <div class="info">
+        <span class="category">{{ product.category or 'Uncategorized' }}</span>
+        <h2>{{ product.name }}</h2>
+        <div class="price">${{ "%.2f"|format(product.price) }}</div>
+
+        <div class="stock">
+            {% if product.stock_quantity > 0 %}
+                <span class="in-stock">✅ In Stock ({{ product.stock_quantity }} available)</span>
+            {% else %}
+                <span class="out-of-stock">❌ Out of Stock</span>
+            {% endif %}
+        </div>
+
+        <div class="description">
+            <strong>Description:</strong>
+            <p>{{ product.description or 'No description available.' }}</p>
+        </div>
+
+        {% if product.stock_quantity > 0 %}
+            <form method="POST" action="{{ url_for('add_to_cart', product_id=product.id) }}" class="add-form">
+                <label for="qty">Quantity:</label>
+                <input type="number" name="quantity" id="qty" value="1" min="1" max="{{ product.stock_quantity }}">
+                <button type="submit">🛒 Add to Cart</button>
+            </form>
+        {% else %}
+            <p style="color:#dc3545; font-weight:600;">Sorry, this product is currently out of stock.</p>
+        {% endif %}
+
+        <a href="{{ url_for('products') }}" class="back-link">← Back to Products</a>
+    </div>
+</div>
+
+{% endblock %}
